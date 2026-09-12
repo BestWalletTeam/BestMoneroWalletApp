@@ -26,7 +26,7 @@ mkdir build && cd build
 cmake .. && cmake --build . -j $(nproc)
 ```
 
-Release builds target x86_64 and aarch64 Linux, x86_64 and arm64 macOS, and x86_64 Windows.
+Release builds target x86_64 and aarch64 Linux and x86_64 Windows.
 
 ## Verifying what you run
 
