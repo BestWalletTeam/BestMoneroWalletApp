@@ -4,6 +4,8 @@ BestWallet is a Qt6 desktop application written in C++. Development happens main
 
 Rolling-release distributions and the current Ubuntu release are what we test against. Older stable distributions may work, but nothing is guaranteed.
 
+The minimum supported Qt version is **6.4**.
+
 ## Getting the source
 
 ```bash
@@ -111,6 +113,23 @@ Two things worth setting on that run configuration:
 - `--stagenet` in the program arguments, to work against stagenet instead of mainnet
 
 Then `Run → Run 'BestWallet'`, or Shift + F10.
+
+## Editing `.ui` files
+
+Qt Designer 6.7 and later writes fully-scoped enum names into `.ui` files
+(`Qt::Orientation::Vertical` rather than `Qt::Vertical`). `uic` before 6.7 compares
+those strings literally, does not recognise the scoped form, and silently generates
+spacers with their two `QSizePolicy` arguments swapped -- the build still succeeds,
+but layouts come out wrong on older Qt.
+
+Keep `.ui` enums in the unscoped form. Every Qt 6 `uic` understands it. After editing
+a form in Designer, run:
+
+```bash
+scripts/check-ui-enums.sh --fix
+```
+
+CMake fails at configure time if a scoped enum makes it into a `.ui` file.
 
 ## CMake options
 

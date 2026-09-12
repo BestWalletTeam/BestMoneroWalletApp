@@ -32,10 +32,10 @@
    <item>
     <widget class="QFrame" name="frame_search">
      <property name="frameShape">
-      <enum>QFrame::Shape::NoFrame</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Shadow::Plain</enum>
+      <enum>QFrame::Plain</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="leftMargin">
@@ -67,7 +67,7 @@
           <normaloff>:/assets/images/preferences.svg</normaloff>:/assets/images/preferences.svg</iconset>
         </property>
         <property name="popupMode">
-         <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+         <enum>QToolButton::InstantPopup</enum>
         </property>
        </widget>
       </item>
@@ -77,10 +77,10 @@
    <item>
     <widget class="QFrame" name="syncNotice">
      <property name="frameShape">
-      <enum>QFrame::Shape::StyledPanel</enum>
+      <enum>QFrame::StyledPanel</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Shadow::Raised</enum>
+      <enum>QFrame::Raised</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="topMargin">
@@ -99,7 +99,7 @@
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
+         <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>

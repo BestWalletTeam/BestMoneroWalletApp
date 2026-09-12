@@ -32,10 +32,10 @@
    <item>
     <widget class="QFrame" name="frame_search">
      <property name="frameShape">
-      <enum>QFrame::Shape::NoFrame</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Shadow::Plain</enum>
+      <enum>QFrame::Plain</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="leftMargin">
@@ -67,7 +67,7 @@
           <normaloff>:/assets/images/preferences.svg</normaloff>:/assets/images/preferences.svg</iconset>
         </property>
         <property name="popupMode">
-         <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+         <enum>QToolButton::InstantPopup</enum>
         </property>
        </widget>
       </item>
@@ -77,7 +77,7 @@
    <item>
     <widget class="QTreeView" name="coins">
      <property name="selectionMode">
-      <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
+      <enum>QAbstractItemView::ExtendedSelection</enum>
      </property>
      <property name="rootIsDecorated">
       <bool>false</bool>

@@ -54,7 +54,7 @@
        <item>
         <widget class="QFrame" name="card_amount">
          <property name="frameShape">
-          <enum>QFrame::Shape::NoFrame</enum>
+          <enum>QFrame::NoFrame</enum>
          </property>
          <layout class="QVBoxLayout" name="layout_amount">
           <property name="spacing">
@@ -72,7 +72,7 @@
             <item>
              <spacer name="spacer_sendCaption">
               <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
+               <enum>Qt::Horizontal</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -148,7 +148,7 @@
                <string/>
               </property>
               <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter</set>
+               <set>Qt::AlignRight|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -159,7 +159,7 @@
             <item>
              <spacer name="spacer_reverseLeft">
               <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
+               <enum>Qt::Horizontal</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -185,7 +185,7 @@
             <item>
              <spacer name="spacer_reverseRight">
               <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
+               <enum>Qt::Horizontal</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -242,7 +242,7 @@
                <string/>
               </property>
               <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter</set>
+               <set>Qt::AlignRight|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -254,7 +254,7 @@
        <item>
         <widget class="QFrame" name="card_payTo">
          <property name="frameShape">
-          <enum>QFrame::Shape::NoFrame</enum>
+          <enum>QFrame::NoFrame</enum>
          </property>
          <layout class="QVBoxLayout" name="layout_payTo">
           <property name="spacing">
@@ -400,7 +400,7 @@
          <item>
           <spacer name="spacer_create">
            <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -425,7 +425,7 @@
        <item>
         <spacer name="spacer_quoteBottom">
          <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+          <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -442,7 +442,7 @@
        <item>
         <spacer name="spacer_unavailableTop">
          <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+          <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -457,7 +457,7 @@
          <item>
           <spacer name="spacer_unavailableLeft">
            <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -476,7 +476,7 @@
             </size>
            </property>
            <property name="frameShape">
-            <enum>QFrame::Shape::NoFrame</enum>
+            <enum>QFrame::NoFrame</enum>
            </property>
            <layout class="QVBoxLayout" name="layout_unavailableCard">
             <property name="spacing">
@@ -488,7 +488,7 @@
                <string>Swaps are temporarily unavailable</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
+               <set>Qt::AlignCenter</set>
               </property>
               <property name="wordWrap">
                <bool>true</bool>
@@ -501,7 +501,7 @@
                <string>Swapping is down for maintenance. Installing the latest version of Best Wallet is what restores it — nothing is wrong with your wallet, and your funds are unaffected.</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
+               <set>Qt::AlignCenter</set>
               </property>
               <property name="wordWrap">
                <bool>true</bool>
@@ -516,7 +516,7 @@
               <item>
                <spacer name="spacer_btnLeft">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -549,7 +549,7 @@
               <item>
                <spacer name="spacer_btnRight">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -567,7 +567,7 @@
          <item>
           <spacer name="spacer_unavailableRight">
            <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -582,7 +582,7 @@
        <item>
         <spacer name="spacer_unavailableBottom">
          <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+          <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -647,7 +647,7 @@
        <item>
         <widget class="QFrame" name="card_deposit">
          <property name="frameShape">
-          <enum>QFrame::Shape::NoFrame</enum>
+          <enum>QFrame::NoFrame</enum>
          </property>
          <layout class="QHBoxLayout" name="layout_deposit">
           <property name="spacing">
@@ -671,7 +671,7 @@
              <cursorShape>PointingHandCursor</cursorShape>
             </property>
             <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
+             <set>Qt::AlignCenter</set>
             </property>
             <property name="text">
              <string/>
@@ -696,7 +696,7 @@
                <string/>
               </property>
               <property name="textInteractionFlags">
-               <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+               <set>Qt::TextSelectableByMouse</set>
               </property>
              </widget>
             </item>
@@ -716,7 +716,7 @@
                <bool>true</bool>
               </property>
               <property name="textInteractionFlags">
-               <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+               <set>Qt::TextSelectableByMouse</set>
               </property>
              </widget>
             </item>
@@ -758,7 +758,7 @@
               <item>
                <spacer name="spacer_depositButtons">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -773,7 +773,7 @@
             <item>
              <spacer name="spacer_depositDetails">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -791,7 +791,7 @@
        <item>
         <widget class="QFrame" name="card_orderDetails">
          <property name="frameShape">
-          <enum>QFrame::Shape::NoFrame</enum>
+          <enum>QFrame::NoFrame</enum>
          </property>
          <layout class="QVBoxLayout" name="layout_orderDetails">
           <property name="spacing">
@@ -806,7 +806,7 @@
              <bool>true</bool>
             </property>
             <property name="textInteractionFlags">
-             <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+             <set>Qt::TextSelectableByMouse</set>
             </property>
            </widget>
           </item>
@@ -819,7 +819,7 @@
              <bool>true</bool>
             </property>
             <property name="textInteractionFlags">
-             <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+             <set>Qt::TextSelectableByMouse</set>
             </property>
            </widget>
           </item>
@@ -829,7 +829,7 @@
              <string/>
             </property>
             <property name="textInteractionFlags">
-             <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+             <set>Qt::TextSelectableByMouse</set>
             </property>
            </widget>
           </item>
@@ -894,7 +894,7 @@
          <item>
           <spacer name="spacer_orderButtons">
            <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -919,7 +919,7 @@
        <item>
         <spacer name="spacer_orderBottom">
          <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+          <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>

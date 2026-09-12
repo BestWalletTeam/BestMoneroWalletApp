@@ -34,7 +34,7 @@
      <item>
       <widget class="QFrame" name="frame_hero">
        <property name="frameShape">
-        <enum>QFrame::Shape::NoFrame</enum>
+        <enum>QFrame::NoFrame</enum>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <property name="leftMargin">
@@ -73,7 +73,7 @@
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -86,7 +86,7 @@
         <item>
          <widget class="QFrame" name="framePill">
           <property name="frameShape">
-           <enum>QFrame::Shape::NoFrame</enum>
+           <enum>QFrame::NoFrame</enum>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <property name="spacing">
@@ -129,7 +129,7 @@
               <string/>
              </property>
              <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -150,7 +150,7 @@
       </size>
      </property>
      <property name="frameShape">
-      <enum>QFrame::Shape::NoFrame</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_chart">
       <property name="spacing">
@@ -182,7 +182,7 @@
         <item>
          <spacer name="horizontalSpacer_chart">
           <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -195,7 +195,7 @@
         <item>
          <widget class="QFrame" name="modeSelector">
           <property name="frameShape">
-           <enum>QFrame::Shape::NoFrame</enum>
+           <enum>QFrame::NoFrame</enum>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_mode">
            <property name="spacing">
@@ -257,7 +257,7 @@
         <item>
          <widget class="QFrame" name="rangeSelector">
           <property name="frameShape">
-           <enum>QFrame::Shape::NoFrame</enum>
+           <enum>QFrame::NoFrame</enum>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_range">
            <property name="spacing">
@@ -391,7 +391,7 @@
    <item>
     <widget class="QFrame" name="frame_activity">
      <property name="frameShape">
-      <enum>QFrame::Shape::NoFrame</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_activity">
       <property name="spacing">
@@ -409,7 +409,7 @@
         <item>
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -428,7 +428,7 @@
            <string>View all history</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -447,7 +447,7 @@
    <item>
     <spacer name="verticalSpacer_3">
      <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
+      <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>

@@ -26,7 +26,28 @@ IF (UNIX AND NOT APPLE)
     list(APPEND QT_COMPONENTS WaylandClient)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
+# uic < 6.7 does not recognise the scoped enum names Designer >= 6.7 writes, and
+# silently swaps spacer size-policy axes instead of failing. See HACKING.md.
+set(BW_SCOPED_ENUM_UI_FILES "")
+file(GLOB_RECURSE BW_UI_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.ui")
+foreach(_ui IN LISTS BW_UI_FILES)
+    file(READ "${_ui}" _ui_contents)
+    string(REGEX MATCHALL "<(enum|set)>[^<]*[A-Za-z_]+::[A-Za-z_]+::[A-Za-z_]+"
+           _ui_scoped "${_ui_contents}")
+    if(_ui_scoped)
+        file(RELATIVE_PATH _ui_rel "${CMAKE_SOURCE_DIR}" "${_ui}")
+        list(APPEND BW_SCOPED_ENUM_UI_FILES "${_ui_rel}")
+    endif()
+endforeach()
+if(BW_SCOPED_ENUM_UI_FILES)
+    string(REPLACE ";" "\n    " _ui_list "${BW_SCOPED_ENUM_UI_FILES}")
+    message(FATAL_ERROR
+        "Fully-scoped enum names found in .ui files:\n    ${_ui_list}\n"
+        "These break layout under Qt < 6.7 (silently -- the build still succeeds).\n"
+        "Run scripts/check-ui-enums.sh --fix to normalize them.")
+endif()
+
+find_package(Qt6 6.4 REQUIRED COMPONENTS ${QT_COMPONENTS})
 
 if (CHECK_UPDATES)
     add_subdirectory(openpgp)
