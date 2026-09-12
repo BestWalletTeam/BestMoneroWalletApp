@@ -1,0 +1,510 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: The Monero Project
+
+#include "SendWidget.h"
+#include "ui_SendWidget.h"
+
+#include "constants.h"
+#include "utils/AppData.h"
+#include "utils/config.h"
+#include "utils/Utils.h"
+#include "Icons.h"
+#include "libwalletqt/Wallet.h"
+#include "libwalletqt/WalletManager.h"
+
+#if defined(WITH_SCANNER)
+#include "wizard/offline_tx_signing/OfflineTxSigningWizard.h"
+#include "qrcode/scanner/QrCodeScanDialog.h"
+#include <QMediaDevices>
+#endif
+
+SendWidget::SendWidget(Wallet *wallet, QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::SendWidget)
+    , m_wallet(wallet)
+{
+    ui->setupUi(this);
+
+    // Without this the page's stylesheet background is ignored; see HomeWidget.
+    this->setAttribute(Qt::WA_StyledBackground, true);
+
+    QString amount_rx = R"(^\d{0,8}[\.,]\d{0,12}|(all)$)";
+    QRegularExpression rx;
+    rx.setPattern(amount_rx);
+    ui->lineAmount->setValidator(new QRegularExpressionValidator(rx, this));
+
+    connect(m_wallet, &Wallet::initiateTransaction, this, &SendWidget::disableSendButton);
+    connect(m_wallet, &Wallet::transactionCreated, this, &SendWidget::enableSendButton);
+    connect(m_wallet, &Wallet::beginCommitTransaction, this, &SendWidget::disableSendButton);
+    connect(m_wallet, &Wallet::transactionCommitted, this, &SendWidget::enableSendButton);
+
+    connect(WalletManager::instance(), &WalletManager::openAliasResolved, this, &SendWidget::onOpenAliasResolved);
+
+    connect(ui->btnScan, &QPushButton::clicked, this, &SendWidget::scanClicked);
+    connect(ui->btnSend, &QPushButton::clicked, this, &SendWidget::sendClicked);
+    connect(ui->btnClear, &QPushButton::clicked, this, &SendWidget::clearClicked);
+    connect(ui->btnMax, &QPushButton::clicked, this, &SendWidget::btnMaxClicked);
+    connect(ui->comboCurrencySelection, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SendWidget::currencyComboChanged);
+    connect(ui->lineAmount, &QLineEdit::textChanged, this, &SendWidget::amountEdited);
+    connect(ui->lineAddress, &QPlainTextEdit::textChanged, this, &SendWidget::addressEdited);
+    connect(ui->btn_openAlias, &QPushButton::clicked, this, &SendWidget::aliasClicked);
+    connect(ui->lineAddress, &PayToEdit::dataPasted, this, &SendWidget::onDataFromQR);
+    ui->label_conversionAmount->setText("");
+    ui->label_conversionAmount->hide();
+    ui->btn_openAlias->hide();
+
+    ui->label_PayTo->setHelpText("Recipient of the funds",
+                                 "You may enter a Monero address, or an alias (email-like address that forwards to a Monero address)",
+                                 "send_transaction");
+    ui->label_Description->setHelpText("Description of the transaction (optional)",
+                                       "The description is not sent to the recipient of the funds. It is stored in your wallet cache, "
+                                       "and displayed in the 'History' tab.",
+                                       "send_transaction");
+    ui->label_Amount->setHelpText("Amount to be sent","This is the exact amount the recipient will receive. "
+                                  "In addition to this amount a transaction fee will be subtracted from your balance. "
+                                  "You will be able to review the transaction fee before the transaction is broadcast.\n\n"
+                                  "To send all your balance, click the Max button to the right.","send_transaction");
+
+    ui->lineAddress->setNetType(constants::networkType);
+    this->setupComboBox();
+
+    this->setManualFeeSelectionEnabled(conf()->get(Config::manualFeeTierSelection).toBool());
+    this->setSubtractFeeFromAmountEnabled(conf()->get(Config::subtractFeeFromAmount).toBool());
+
+    // skinChanged() is otherwise only invoked on an actual skin change.
+    this->skinChanged();
+}
+
+void SendWidget::currencyComboChanged(int index) {
+    Q_UNUSED(index)
+    if (m_sendAll) {
+        // The figure shown is the balance, so restate it in the new currency.
+        this->btnMaxClicked();
+        return;
+    }
+
+    QString amount = ui->lineAmount->text();
+    if (amount.isEmpty()) {
+        return;
+    }
+    this->amountEdited(amount);
+}
+
+void SendWidget::addressEdited() {
+    QVector<PartialTxOutput> outputs = ui->lineAddress->getOutputs();
+
+    bool freezeAmounts = !outputs.empty();
+
+    ui->lineAmount->setReadOnly(freezeAmounts);
+    ui->lineAmount->setFrame(!freezeAmounts);
+    ui->btnMax->setDisabled(freezeAmounts);
+    ui->comboCurrencySelection->setDisabled(freezeAmounts);
+
+    if (!outputs.empty()) {
+        ui->lineAmount->setText(WalletManager::displayAmount(ui->lineAddress->getTotal(), false));
+        ui->comboCurrencySelection->setCurrentIndex(0);
+    }
+
+    ui->btn_openAlias->setVisible(ui->lineAddress->isOpenAlias());
+}
+
+void SendWidget::amountEdited(const QString &text) {
+    Q_UNUSED(text)
+    // Only a hand-edit cancels the sweep, and setAmountText's own writes reach
+    // here too, since lineAmount is watched with textChanged.
+    if (!m_fillingAmount) {
+        m_sendAll = false;
+    }
+    this->updateConversionLabel();
+}
+
+void SendWidget::fill(double amount) {
+    ui->lineAmount->setText(QString::number(amount));
+}
+
+void SendWidget::fill(const QString &address, const QString &description, double amount, bool overrideDescription) {
+    ui->lineAddress->setText(address);
+    ui->lineAddress->moveCursor(QTextCursor::Start);
+
+    if (overrideDescription || ui->lineDescription->text().isEmpty()) {
+      ui->lineDescription->setText(description);
+    }
+
+    if (amount > 0) {
+        // Full precision, and through the same formatter the sender used: a
+        // rounded figure here would under-fund a swap deposit.
+        ui->lineAmount->setText(Utils::trimmedDecimal(amount, 12));
+    }
+    ui->lineAmount->setFocus();
+
+    this->updateConversionLabel();
+}
+
+void SendWidget::fillAddress(const QString &address) {
+    ui->lineAddress->setText(address);
+    ui->lineAddress->moveCursor(QTextCursor::Start);
+}
+
+void SendWidget::scanClicked() {
+#if defined(WITH_SCANNER)
+    auto cameras = QMediaDevices::videoInputs();
+    if (cameras.empty()) {
+        Utils::showError(this, "Can't open QR scanner", "No available cameras found");
+        return;
+    }
+
+    auto dialog = new QrCodeScanDialog(this, false);
+    dialog->exec();
+    this->onDataFromQR(dialog->decodedString());
+    dialog->deleteLater();
+#else
+    Utils::showError(this, "Can't open QR scanner", "Best Wallet was built without webcam QR scanner support");
+#endif
+}
+
+void SendWidget::sendClicked() {
+    if (!m_wallet->isConnected()) {
+        Utils::showError(this, "Unable to create transaction", "Wallet is not connected to a node.",
+                         {"Wait for the wallet to automatically connect to a node.", "Go to File -> Settings -> Network -> Node to manually connect to a node."},
+                         "nodes");
+        return;
+    }
+
+    if (!m_wallet->isSynchronized()) {
+        Utils::showError(this, "Unable to create transaction", "Wallet is not synchronized", {"Wait for wallet synchronization to complete"}, "synchronization");
+        return;
+    }
+
+    QString recipient = ui->lineAddress->text().simplified().remove(' ');
+    if (recipient.isEmpty()) {
+        Utils::showError(this, "Unable to create transaction", "No address was entered", {"Enter an address in the 'Pay to' field."}, "send_transaction");
+        return;
+    }
+
+    QVector<PartialTxOutput> outputs = ui->lineAddress->getOutputs();
+    QVector<PayToLineError> errors = ui->lineAddress->getErrors();
+    if (!errors.empty() && ui->lineAddress->isMultiline()) {
+        QString errorText;
+        for (auto &error: errors) {
+            errorText += QString("Line #%1:\n%2\n").arg(QString::number(error.idx + 1), error.error);
+        }
+
+        Utils::showError(this, "Unable to create transaction", QString("Invalid address lines found:\n\n%1").arg(errorText), {}, "pay_to_many");
+        return;
+    }
+
+    bool subtractFeeFromAmount = conf()->get(Config::subtractFeeFromAmount).toBool() && ui->check_subtractFeeFromAmount->isChecked();
+
+    QString description = ui->lineDescription->text();
+
+    if (!outputs.empty()) { // multi destination transaction
+        if (outputs.size() > 15) {
+            Utils::showError(this, "Unable to create transaction", "Maximum number of outputs (15) exceeded.", {}, "pay_to_many");
+            return;
+        }
+
+        QVector<QString> addresses;
+        QVector<quint64> amounts;
+        for (auto &output : outputs) {
+            addresses.push_back(output.address);
+            amounts.push_back(output.amount);
+        }
+
+        QtFuture::connect(m_wallet, &Wallet::preTransactionChecksComplete)
+                .then([this, addresses, amounts, description, subtractFeeFromAmount](int feeLevel){
+                    m_wallet->createTransactionMultiDest(addresses, amounts, description, feeLevel, subtractFeeFromAmount);
+                });
+
+        m_wallet->preTransactionChecks(ui->combo_feePriority->currentIndex());
+
+        return;
+    }
+
+    bool sendAll = m_sendAll;
+    QString currency = ui->comboCurrencySelection->currentText();
+    // A sweep works out its own figure (balance minus fee), so the number in the
+    // field is there to be read, not to be spent.
+    quint64 amount = sendAll ? 0 : this->amount();
+
+    if (amount == 0 && !sendAll) {
+        Utils::showError(this, "Unable to create transaction", "No amount was entered", {}, "send_transaction", "Amount field");
+        return;
+    }
+
+    if (currency != "XMR" && !sendAll) {
+        if (!appData()->prices.canConvert(currency, "XMR")) {
+            Utils::showError(this, "Unable to create transaction",
+                             QString("No exchange rates were received, so the amount in %1 can't be converted to XMR.").arg(currency),
+                             {"Enter the amount in XMR instead, or",
+                              "Wait for exchange rates to be received, then try again."},
+                             "send_transaction", "Amount field");
+            return;
+        }
+
+        // Convert fiat amount to XMR, but only if we're not sending the entire balance
+        amount = WalletManager::amountFromDouble(this->conversionAmount());
+    }
+
+    quint64 unlocked_balance = m_wallet->unlockedBalance();
+    quint64 total_balance = m_wallet->balance();
+    if (total_balance == 0) {
+        Utils::showError(this, "Unable to create transaction", "No money to spend");
+        return;
+    }
+
+    if (unlocked_balance == 0) {
+        Utils::showError(this, "Unable to create transaction", QString("No spendable balance.\n\n%1 XMR becomes spendable within 10 blocks (~20 minutes).").arg(WalletManager::displayAmount(total_balance - unlocked_balance)), {"Wait for more balance to unlock.", "Click 'Help' to learn more about how balance works."}, "balance");
+        return;
+    }
+
+    if (!sendAll && amount > unlocked_balance) {
+        Utils::showError(this, "Unable to create transaction", QString("Not enough money to spend.\n\n"
+                                                                       "Spendable balance: %1").arg(WalletManager::displayAmount(unlocked_balance)));
+        return;
+    }
+
+    // TODO: allow using file-only airgapped signing without scanner
+
+    if (m_wallet->keyImageSyncNeeded(amount, sendAll)) {
+        #if defined(WITH_SCANNER)
+        OfflineTxSigningWizard wizard(this, m_wallet);
+        auto r = wizard.exec();
+        m_wallet->setForceKeyImageSync(false);
+
+        if (r == QDialog::Rejected) {
+            return;
+        }
+        #else
+        Utils::showError(this, "Can't open offline transaction signing wizard", "Best Wallet was built without webcam QR scanner support");
+        return;
+        #endif
+    }
+
+    QtFuture::connect(m_wallet, &Wallet::preTransactionChecksComplete)
+            .then([this, recipient, amount, description, sendAll, subtractFeeFromAmount](int feeLevel){
+                m_wallet->createTransaction(recipient, amount, description, sendAll, feeLevel, subtractFeeFromAmount);
+            });
+
+    m_wallet->preTransactionChecks(ui->combo_feePriority->currentIndex());
+}
+
+void SendWidget::aliasClicked() {
+    ui->btn_openAlias->setEnabled(false);
+    auto alias = ui->lineAddress->text();
+    WalletManager::instance()->resolveOpenAliasAsync(alias);
+}
+
+void SendWidget::clearClicked() {
+    ui->lineAddress->clear();
+    ui->lineAmount->clear();
+    ui->lineDescription->clear();
+}
+
+void SendWidget::btnMaxClicked() {
+    // Sweep the account: the field shows the figure and the intent lives in
+    // m_sendAll. The fee comes out of it at send time, so this is what is
+    // available rather than what will arrive.
+    m_sendAll = true;
+
+    const quint64 spendable = m_wallet->unlockedBalance();
+    const QString currency = ui->comboCurrencySelection->currentText();
+
+    if (currency == "XMR") {
+        // Full precision: the figure has to match the balance exactly if the
+        // user edits it.
+        this->setAmountText(WalletManager::displayAmount(spendable, false));
+    }
+    else if (appData()->prices.canConvert("XMR", currency)) {
+        const double converted =
+            appData()->prices.convert("XMR", currency, spendable / constants::cdiv);
+        this->setAmountText(QString::number(converted, 'f', 2));
+    }
+    else {
+        // No rate for the chosen currency, so fall back to XMR. Re-enters this
+        // slot once via the combo's signal, which then takes the branch above.
+        const int xmrIndex = ui->comboCurrencySelection->findText("XMR");
+        if (xmrIndex >= 0 && xmrIndex != ui->comboCurrencySelection->currentIndex()) {
+            ui->comboCurrencySelection->setCurrentIndex(xmrIndex);
+            return;
+        }
+        this->setAmountText(WalletManager::displayAmount(spendable, false));
+    }
+
+    this->updateConversionLabel();
+}
+
+void SendWidget::setAmountText(const QString &text) {
+    m_fillingAmount = true;
+    ui->lineAmount->setText(text);
+    m_fillingAmount = false;
+}
+
+void SendWidget::updateConversionLabel() {
+    auto amount = this->amountDouble();
+
+    ui->label_conversionAmount->setText("");
+    if (amount <= 0) {
+        ui->label_conversionAmount->hide();
+        return;
+    }
+
+    if (conf()->get(Config::disableWebsocket).toBool()) {
+        return;
+    }
+
+    QString currency = ui->comboCurrencySelection->currentText();
+    auto preferredFiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
+    if (!appData()->prices.canConvert(currency, currency != "XMR" ? "XMR" : preferredFiatCurrency)) {
+        ui->label_conversionAmount->hide();
+        return;
+    }
+
+    QString conversionAmountStr = [this, &currency, &preferredFiatCurrency]{
+        if (currency != "XMR") {
+            return QString("~%1 XMR").arg(QString::number(this->conversionAmount(), 'f'));
+
+        } else {
+            double conversionAmount = appData()->prices.convert("XMR", preferredFiatCurrency, this->amountDouble());
+            return QString("~%1 %2").arg(QString::number(conversionAmount, 'f', 2), preferredFiatCurrency);
+        }
+    }();
+
+    ui->label_conversionAmount->setText(conversionAmountStr);
+    ui->label_conversionAmount->show();
+}
+
+double SendWidget::conversionAmount() {
+    QString currency = ui->comboCurrencySelection->currentText();
+    return appData()->prices.convert(currency, "XMR", this->amountDouble());
+}
+
+quint64 SendWidget::amount() {
+    // grab amount from "amount" text box
+    QString amount = ui->lineAmount->text();
+    amount.replace(',', '.');
+    if (amount.isEmpty()) {
+        return 0;
+    }
+
+    return WalletManager::amountFromString(amount);
+}
+
+double SendWidget::amountDouble() {
+    quint64 amount = this->amount();
+    return amount / constants::cdiv;
+}
+
+void SendWidget::onOpenAliasResolved(const QString &openAlias, const QString &address, bool dnssecValid) {
+    ui->btn_openAlias->setEnabled(true);
+
+    if (address.isEmpty()) {
+        Utils::showError(this, "Unable to resolve OpenAlias", "Address empty.");
+        return;
+    }
+
+    if (!dnssecValid) {
+        Utils::showError(this, "Unable to resolve OpenAlias", "Address found, but the DNSSEC signatures could not be verified, so this address may be spoofed.");
+        return;
+    }
+
+    bool valid = WalletManager::addressValid(address, constants::networkType);
+    if (!valid) {
+        Utils::showError(this, "Unable to resolve OpenAlias", QString("Address validation failed.\n\nOpenAlias: %1\nAddress: %2").arg(openAlias, address));
+        return;
+    }
+
+    this->fill(address, openAlias);
+    ui->btn_openAlias->hide();
+}
+
+void SendWidget::clearFields() {
+    ui->lineAddress->clear();
+    ui->lineAmount->clear();
+    ui->lineDescription->clear();
+    ui->label_conversionAmount->clear();
+}
+
+void SendWidget::payToMany() {
+    ui->lineAddress->payToMany();
+}
+
+void SendWidget::disableSendButton() {
+    ui->btnSend->setEnabled(false);
+}
+
+void SendWidget::enableSendButton() {
+    if (m_disallowSending) {
+        return;
+    }
+    ui->btnSend->setEnabled(true);
+}
+
+void SendWidget::disallowSending() {
+    m_disallowSending = true;
+    ui->btnSend->setEnabled(false);
+}
+
+void SendWidget::setWebsocketEnabled(bool enabled) {
+    this->updateConversionLabel();
+    if (enabled) {
+        this->setupComboBox();
+    } else {
+        ui->comboCurrencySelection->clear();
+        ui->comboCurrencySelection->insertItem(0, "XMR");
+    }
+}
+
+void SendWidget::setManualFeeSelectionEnabled(bool enabled) {
+    ui->label_feeTarget->setVisible(enabled);
+    ui->combo_feePriority->setVisible(enabled);
+}
+
+void SendWidget::setSubtractFeeFromAmountEnabled(bool enabled) {
+    ui->check_subtractFeeFromAmount->setVisible(enabled);
+}
+
+void SendWidget::onDataFromQR(const QString &data) {
+    if (!data.isEmpty()) {
+        QVariantMap uriData = m_wallet->parse_uri_to_object(data);
+        if (!uriData.contains("error")) {
+            ui->lineAddress->setText(uriData.value("address").toString());
+            ui->lineDescription->setText(uriData.value("tx_description").toString());
+
+            // Strip trailing zeroes
+            auto amountStr = uriData.value("amount").toString();
+            auto amount = WalletManager::amountFromString(amountStr);
+            ui->lineAmount->setText(WalletManager::displayAmount(amount, false));
+        } else {
+            ui->lineAddress->setText(data);
+        }
+    }
+    else {
+        Utils::showError(this, "Unable to decode QR code", "No QR code found.");
+    }
+}
+
+void SendWidget::setupComboBox() {
+    ui->comboCurrencySelection->clear();
+
+    QStringList defaultCurrencies = {"XMR", "USD", "EUR", "CNY", "JPY", "GBP"};
+    QString preferredCurrency = conf()->get(Config::preferredFiatCurrency).toString();
+
+    if (defaultCurrencies.contains(preferredCurrency)) {
+        defaultCurrencies.removeOne(preferredCurrency);
+    }
+
+    ui->comboCurrencySelection->insertItems(0, defaultCurrencies);
+    ui->comboCurrencySelection->insertItem(1, preferredCurrency);
+}
+
+void SendWidget::onPreferredFiatCurrencyChanged() {
+    this->updateConversionLabel();
+    this->setupComboBox();
+}
+
+void SendWidget::skinChanged() {
+    // Ships white, so it is recoloured to the theme's text ink.
+    ui->btnScan->setIcon(icons()->tinted("qrcode_white.png"));
+}
+
+SendWidget::~SendWidget() = default;

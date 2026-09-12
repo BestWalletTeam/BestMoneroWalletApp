@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: The Monero Project
+
+#ifndef BESTWALLET_APPDATA_H
+#define BESTWALLET_APPDATA_H
+
+#include <QObject>
+#include <QPointer>
+
+#include "prices.h"
+#include "RestoreHeightLookup.h"
+
+class AppData : public QObject {
+Q_OBJECT
+
+public:
+    explicit AppData(QObject *parent);
+    static AppData* instance();
+
+    Prices prices;
+    QMap<NetworkType::Type, int> heights;
+    QMap<NetworkType::Type, RestoreHeightLookup*> restoreHeights;
+
+private slots:
+    void onBlockHeightsReceived(int mainnet, int stagenet);
+
+private:
+    void initRestoreHeights();
+
+    static QPointer<AppData> m_instance;
+};
+
+inline AppData* appData()
+{
+    return AppData::instance();
+}
+
+#endif //BESTWALLET_APPDATA_H

@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: The Monero Project
+
+#ifndef BESTWALLET_PRICES_H
+#define BESTWALLET_PRICES_H
+
+#include <QObject>
+
+#include "utils/Utils.h"
+
+struct marketStruct {
+    QString symbol;
+    QString name;
+    QString image;
+    double price_usd;
+    double price_usd_change_pct_24h;
+};
+
+class Prices : public QObject
+{
+Q_OBJECT
+
+public:
+    explicit Prices(QObject *parent = nullptr);
+    QMap<QString, double> rates;
+    QMap<QString, marketStruct> markets;
+
+public slots:
+    void cryptoPricesReceived(const QJsonArray &data);
+    void fiatPricesReceived(const QJsonObject &data);
+
+    bool canConvert(QString symbolFrom, QString symbolTo);
+    double convert(QString symbolFrom, QString symbolTo, double amount);
+    QString atomicUnitsToPreferredFiatString(quint64 amount, bool wrapInParens = false);
+
+signals:
+    void fiatPricesUpdated();
+    void cryptoPricesUpdated();
+};
+
+#endif //BESTWALLET_PRICES_H

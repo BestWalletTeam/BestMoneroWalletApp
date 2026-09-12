@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>org.bestwallet.BestWallet</id>
+    <name>Best Wallet</name>
+    <summary>Monero desktop wallet</summary>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>BSD-3-Clause</project_license>
+    <categories>
+        <category>Network</category>
+        <category>Qt</category>
+        <category>Finance</category>
+        <category>Office</category>
+    </categories>
+    <description>
+        <p>BestWallet is a Monero wallet for desktop with the following features:</p>
+        <ul>
+            <li>
+                Easy-to-use, small and fast - BestWallet
+                runs well on any modern hardware, including virtual machines
+                and live operating systems.
+            </li>
+            <li>
+                Beginner friendly, but also caters to advanced Monero
+                users by providing a feature set that is on par with the official CLI.
+            </li>
+            <li>
+                Ships with sane defaults that suit most users, but
+                can also be configured for high or uncommon threat models.
+            </li>
+            <li>
+                Serves as a testing grounds for experimental features
+                that may later be adopted in the reference wallets.
+            </li>
+        </ul>
+    </description>
+    <launchable type="desktop-id">org.bestwallet.BestWallet.desktop</launchable>
+    <screenshots>
+        <screenshot type="default">
+            <image>https://bestmonerowallet.app/img/receive_light.png</image>
+        </screenshot>
+    </screenshots>
+    <url type="homepage">https://bestmonerowallet.app/</url>
+    <url type="bugtracker">https://github.com/BestWalletTeam/BestWalletApp/issues</url>
+    <url type="contact">https://github.com/BestWalletTeam/BestWalletApp/issues</url>
+    <url type="help">https://bestmonerowallet.app/guides</url>
+    <url type="vcs-browser">https://github.com/BestWalletTeam/BestWalletApp</url>
+
+    <developer id="app.bestmonerowallet">
+        <name>BestWallet</name>
+    </developer>
+</component>

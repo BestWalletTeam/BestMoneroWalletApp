@@ -1,0 +1,25 @@
+.DS_Store
+lib/*
+cmake-build-debug/*
+cmake-build-release/*
+.idea
+*.user
+*.stash
+build/*
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+BestWallet_autogen/
+BestWallet.cbp
+src/assets_tor.qrc
+src/assets_docs.qrc
+BestWallet.AppDir/*
+src/assets/tor/*
+src/assets/docs/*
+!src/assets/tor/.gitkeep
+!src/assets/docs/.gitkeep
+contrib/installers/windows/setup.nsi
+githash.txt
+
+# guix
+/guix

@@ -1,0 +1,57 @@
+{
+  "mainnet": {
+    "tor": [
+      "loveanvthlsepingenr7opdqy6nlhn5jidwvzzxfmwsw2rry5mn2gfqd.onion:18089",
+      "ip4zpbps7unk6xhlanqtw24f75akfbl3upeckfjqjks7ftfnk4i73oid.onion:18081",
+      "plowsof3t5hogddwabaeiyrno25efmzfxyro2vligremt7sxpsclfaid.onion:18089",
+      "plowsoffjexmxalw73tkjmf422gq6575fc7vicuu4javzn2ynnte6tyd.onion:18089",
+      "plowsofe6cleftfmk2raiw5h2x66atrik3nja4bfd3zrfa2hdlgworad.onion:18089",
+      "ravfxmrqgd4j2o2gdc2yaij2wcmkcflu2rdnzhng5htk5hgnh6gmyeid.onion:18081",
+      "ravfxmrzi3eet62s4nkuu5sgpq6otgtffluk3ylb2kuvimtb34sonryd.onion:18089",
+      "rucknium757bokwv3ss35ftgc3gzb7hgbvvglbg3hisp7tsj2fkd2nyd.onion:18081",
+      "a6orjo6aiotog3njppja5jwnd3rexzfjiejxnojvw74p3kma45fundid.onion:18089",
+      "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089"
+    ],
+    "i2p": [
+      "ofrnxmr5ltaazarexs3damrcsldc5p6qlcos3vk25cwdgyjvrueq.b32.i2p:18089",
+      "vdmnehdjkpkg57nthgnjfuaqgku673r5bpbqg56ix6fyqoywgqrq.b32.i2p:18089",
+      "uqj3aphckqtjsitz7kxx5flqpwjlq5ppr3chazfued7xucv3nheq.b32.i2p:18089",
+      "ugnlcdciyhghh2zert7c3kl4biwkirc43ke33jiy5slnd3mv2trq.b32.i2p:18089",
+      "ravfxmrg42nts5q65c33gyvs4gpb5n3a3wzzx3w2bes2hbkakfsa.b32.i2p:18081",
+      "ravfxmresnvpybolnczn7wsju55c6jej3vo5hrnvcypugrdy4u6q.b32.i2p:18089",
+      "5dmhmmaff5mqkgmz4haq5w2wrgobhelrat7lvbt27okojkzbx6hq.b32.i2p:18089"
+    ],
+    "clearnet": [
+      "node3-us.monero.love:18081",
+      "xmr-node.cakewallet.com:18081",
+      "node.monerodevs.org:18089",
+      "node2.monerodevs.org:18089",
+      "node3.monerodevs.org:18089",
+      "ravfx.its-a-node.org:18081",
+      "ravfx2.its-a-node.org:18089",
+      "rucknium.me:18081",
+      "node.sethforprivacy.com:18089",
+      "xmr.stormycloud.org:18089"
+    ]
+  },
+  "testnet": {
+    "tor": [
+      "plowsof3t5hogddwabaeiyrno25efmzfxyro2vligremt7sxpsclfaid.onion:28089",
+      "plowsoffjexmxalw73tkjmf422gq6575fc7vicuu4javzn2ynnte6tyd.onion:28089"
+    ],
+    "clearnet": [
+      "node.sethforprivacy.com:28089"
+    ]
+  },
+  "stagenet": {
+    "tor": [
+      "ct36dsbe3oubpbebpxmiqz4uqk6zb6nhmkhoekileo4fts23rvuse2qd.onion:38081",
+      "plowsof3t5hogddwabaeiyrno25efmzfxyro2vligremt7sxpsclfaid.onion:38089",
+      "plowsoffjexmxalw73tkjmf422gq6575fc7vicuu4javzn2ynnte6tyd.onion:38089"
+    ],
+    "clearnet": [
+      "xmr-lux.boldsuck.org:38081",
+      "node.sethforprivacy.com:38089"
+    ]
+  }
+}

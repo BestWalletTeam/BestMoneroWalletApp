@@ -1,0 +1,26 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: The Monero Project
+
+#ifndef BESTWALLET_CALCWINDOW_H
+#define BESTWALLET_CALCWINDOW_H
+
+#include <QMainWindow>
+
+namespace Ui {
+    class CalcWindow;
+}
+
+class CalcWindow : public QMainWindow
+{
+Q_OBJECT
+
+public:
+    explicit CalcWindow(QWidget *parent = nullptr);
+    ~CalcWindow() override;
+
+private:
+    QScopedPointer<Ui::CalcWindow> ui;
+};
+
+#endif // BESTWALLET_CALCWINDOW_H
+

@@ -1,0 +1,36 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: The Monero Project
+
+#ifndef BESTWALLET_PASSWORDSETWIDGET_H
+#define BESTWALLET_PASSWORDSETWIDGET_H
+
+#include <QWidget>
+
+namespace Ui {
+    class PasswordSetWidget;
+}
+
+class PasswordSetWidget : public QWidget
+{
+Q_OBJECT
+
+public:
+    explicit PasswordSetWidget(QWidget *parent = nullptr);
+    ~PasswordSetWidget() override;
+
+    QString password();
+    bool passwordsMatch();
+    void resetFields();
+
+signals:
+    void passwordEntryChanged();
+
+private slots:
+    void onPasswordEntryChanged();
+
+private:
+    QScopedPointer<Ui::PasswordSetWidget> ui;
+};
+
+
+#endif //BESTWALLET_PASSWORDSETWIDGET_H

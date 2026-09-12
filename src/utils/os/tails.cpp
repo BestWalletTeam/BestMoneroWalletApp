@@ -1,0 +1,108 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: The Monero Project
+
+#include "tails.h"
+
+#include <QDir>
+#include <QRegularExpression>
+#include <QMessageBox>
+
+#include "Utils.h"
+
+bool TailsOS::detected = false;
+bool TailsOS::isTails = false;
+const QString TailsOS::tailsPathData = QString("/live/persistence/TailsData_unlocked/");
+
+bool TailsOS::detect()
+{
+    if (detected) {
+        return TailsOS::isTails;
+    }
+
+    if (!Utils::fileExists("/etc/os-release"))
+        return false;
+
+    QByteArray data = Utils::fileOpen("/etc/os-release");
+    QRegularExpression re("TAILS_PRODUCT_NAME=\"Tails\"");
+    QRegularExpressionMatch os_match = re.match(data);
+
+    QRegularExpression re_6("NAME=\"Tails\"");
+    bool matched = os_match.hasMatch() || re_6.match(data).hasMatch();
+
+    if (matched)
+        qDebug() << "Tails OS detected";
+
+    TailsOS::detected = true;
+    TailsOS::isTails = matched;
+
+    return matched;
+}
+
+bool TailsOS::detectDataPersistence()
+{
+    return QDir(QDir::homePath() + "/Persistent").exists();
+}
+
+bool TailsOS::detectDotPersistence()
+{
+    return QDir(tailsPathData + "dotfiles").exists();
+}
+
+QString TailsOS::version()
+{
+    if (!Utils::fileExists("/etc/os-release"))
+        return "";
+
+    QByteArray data = Utils::fileOpen("/etc/os-release");
+    QRegularExpression re(R"(TAILS_VERSION_ID="(\d+.\d+))");
+    QRegularExpressionMatch match = re.match(data);
+    if (match.hasMatch()) {
+        return match.captured(1);
+    }
+    return "";
+}
+
+void TailsOS::showDataPersistenceDisabledWarning()
+{
+    QMessageBox msgBox;
+    msgBox.setText(QObject::tr("Warning: persistence disabled"));
+    msgBox.setWindowTitle(QObject::tr("Warning: persistence disabled"));
+    msgBox.setInformativeText(
+        QObject::tr("Best Wallet has detected that Tails persistence is "
+                     "currently disabled. Any configurations and wallets you make inside "
+                     "Best Wallet will not be permanently saved."
+                     "\n\n"
+                     "Make sure to not save your wallet on the "
+                     "filesystem, as it will be lost at shutdown."
+                     "\n\n"
+                     "To enable Tails persistence, setup an encrypted volume "
+                     "and restart Tails. To gain a startup menu item, "
+                     "enable dotfiles persistence."));
+
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.setIconPixmap(QPixmap(":/images/tails-grey.png"));
+    msgBox.exec();
+}
+
+void TailsOS::persistXdgMime(const QString &filePath, const QString &data)
+{
+    QFileInfo file(filePath);
+    QString tailsPath = tailsPathData + "dotfiles/.local/share/applications/";
+
+    // write to persistent volume
+#ifdef QT_DEBUG
+    qDebug() << "Writing xdg mime: " << tailsPath + file.fileName();
+#endif
+
+    QDir().mkpath(tailsPath);  // ensure directory exists
+    Utils::fileWrite(tailsPath + file.fileName(), data);
+
+    // write to current session
+#ifdef QT_DEBUG
+    qDebug() << "Writing xdg mime: " << file.filePath();
+#endif
+
+    QDir().mkpath(file.path());  // ensure directory exists
+    Utils::fileWrite(file.filePath(), data);
+}

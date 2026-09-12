@@ -1,0 +1,42 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: The Monero Project
+
+#ifndef BESTWALLET_WALLETUNLOCKWIDGET_H
+#define BESTWALLET_WALLETUNLOCKWIDGET_H
+
+#include <QWidget>
+
+class Wallet;
+
+namespace Ui {
+    class WalletUnlockWidget;
+}
+
+class WalletUnlockWidget : public QWidget
+{
+Q_OBJECT
+
+public:
+    explicit WalletUnlockWidget(QWidget *parent, Wallet *wallet = nullptr);
+    ~WalletUnlockWidget();
+
+    void setWalletName(const QString &walletName);
+    void reset();
+    void incorrectPassword();
+
+signals:
+    void unlockWallet(const QString &password);
+    void closeWallet();
+
+private slots:
+    void tryUnlock();
+
+protected:
+    void keyPressEvent(QKeyEvent* e) override;
+
+private:
+    QScopedPointer<Ui::WalletUnlockWidget> ui;
+    Wallet *m_wallet;
+};
+
+#endif //BESTWALLET_WALLETUNLOCKWIDGET_H

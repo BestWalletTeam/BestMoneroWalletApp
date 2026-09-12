@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/qss_icons">
+        <file>svg/history.svg</file>
+        <file>svg/portfolio.svg</file>
+        <file>svg/receive.svg</file>
+        <file>svg/send.svg</file>
+        <file>svg/swap.svg</file>
+    </qresource>
+</RCC>

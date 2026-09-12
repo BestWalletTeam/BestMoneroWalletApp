@@ -1,0 +1,2 @@
+#pragma once
+#define CHANGENOW_API_KEY "@CHANGENOW_API_KEY@"

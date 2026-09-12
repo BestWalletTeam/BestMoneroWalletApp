@@ -1,0 +1,13 @@
+diff --git a/configure b/configure
+index 15853d6..b24638d 100755
+--- a/configure
++++ b/configure
+@@ -21468,7 +21468,7 @@ printf "%s\n" "yes" >&6; }
+ 
+ fi
+ 
+-DEF_CURSORPATH="~/.local/share/icons:~/.icons:${datadir}/icons:${datadir}/pixmaps"
++DEF_CURSORPATH="~/.local/share/icons:~/.icons:${datadir}/icons:${datadir}/pixmaps:/run/host/share/icons"
+ 
+ # Check whether --with-cursorpath was given.
+ if test ${with_cursorpath+y}

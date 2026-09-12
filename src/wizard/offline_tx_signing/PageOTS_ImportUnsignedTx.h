@@ -1,0 +1,28 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: The Monero Project
+
+#ifndef BESTWALLET_PAGEOTS_IMPORTUNSIGNEDTX_H
+#define BESTWALLET_PAGEOTS_IMPORTUNSIGNEDTX_H
+
+#include <QWizardPage>
+#include "Wallet.h"
+#include "OfflineTxSigningWizard.h"
+#include "PageOTS_Import.h"
+
+namespace Ui {
+    class PageOTS_Import;
+}
+
+class PageOTS_ImportUnsignedTx : public PageOTS_Import
+{
+Q_OBJECT
+
+public:
+    explicit PageOTS_ImportUnsignedTx(QWidget *parent, Wallet *wallet, TxWizardFields *wizardFields);
+    [[nodiscard]] int nextId() const override;
+
+private slots:
+    void importFromStr(const std::string &data) override;
+};
+
+#endif //BESTWALLET_PAGEOTS_IMPORTUNSIGNEDTX_H

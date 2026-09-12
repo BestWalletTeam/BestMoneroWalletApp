@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Best Wallet
+GenericName=Monero Wallet
+Comment=A free Monero desktop wallet
+Icon=org.bestwallet.BestWallet
+Exec=/app/startup
+Terminal=false
+Categories=Network;Qt;Finance
+StartupNotify=false
+StartupWMClass=BestWallet

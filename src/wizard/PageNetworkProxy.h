@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: The Monero Project
+
+#ifndef BESTWALLET_PAGENETWORKPROXY_H
+#define BESTWALLET_PAGENETWORKPROXY_H
+
+#include <QWizardPage>
+
+namespace Ui {
+    class PageNetworkProxy;
+}
+
+class PageNetworkProxy : public QWizardPage
+{
+Q_OBJECT
+
+public:
+    explicit PageNetworkProxy(QWidget *parent = nullptr);
+    void initializePage() override;
+    bool validatePage() override;
+    int nextId() const override;
+
+signals:
+    void initialNetworkConfigured();
+
+private:
+    Ui::PageNetworkProxy *ui;
+};
+
+#endif //BESTWALLET_PAGENETWORKPROXY_H

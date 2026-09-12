@@ -1,0 +1,10 @@
+[submodule "monero"]
+	path = monero
+	url = https://github.com/BestWalletTeam/monero
+	branch = v0.18.5.1-bestwallet
+[submodule "polyseed"]
+	path = src/third-party/polyseed
+	url = https://github.com/tevador/polyseed
+[submodule "bestwallet-sigs"]
+	path = external/bestwallet-sigs
+	url = https://github.com/BestWalletTeam/bestwallet-sigs

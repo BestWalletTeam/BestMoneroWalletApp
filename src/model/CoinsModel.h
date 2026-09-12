@@ -1,0 +1,57 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: The Monero Project
+
+#ifndef BESTWALLET_COINSMODEL_H
+#define BESTWALLET_COINSMODEL_H
+
+#include <QAbstractTableModel>
+
+class Coins;
+class CoinsInfo;
+
+class CoinsModel : public QAbstractTableModel
+{
+Q_OBJECT
+
+public:
+    enum ModelColumn
+    {
+        KeyImageKnown = 0,
+        PubKey,
+        TxID,
+        Address,
+        Label,
+        BlockHeight,
+        SpentHeight,
+        Amount,
+        Spent,
+        Frozen,
+        COUNT
+    };
+
+    explicit CoinsModel(QObject *parent, Coins *coins);
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+
+    const CoinsInfo& entryFromIndex(const QModelIndex &index) const;
+
+    void setCurrentSubaddressAccount(quint32 accountIndex);
+    void setSelected(const QStringList &selected);
+
+signals:
+    void descriptionChanged();
+
+private:
+    QVariant parseTransactionInfo(const CoinsInfo &cInfo, int column, int role) const;
+
+    Coins *m_coins;
+    quint32 m_currentSubaddressAccount;
+    QSet<QString> m_selected;
+};
+
+#endif //BESTWALLET_COINSMODEL_H
