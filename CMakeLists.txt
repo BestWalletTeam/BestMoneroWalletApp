@@ -26,6 +26,7 @@ cmake_policy(SET CMP0074 NEW)
 option(STATIC "Link libraries statically, requires static Qt" OFF)
 option(SELF_CONTAINED "Disable when building BestWallet for distribution packages" OFF)
 option(TOR_DIR "Directory containing Tor binaries to embed inside BestWallet" OFF)
+option(TOR_BUNDLED "Embed the in-tree Tor binary (src/assets/tor) when TOR_DIR is not given" ON)
 option(CHECK_UPDATES "Enable checking for application updates" OFF)
 option(PLATFORM_INSTALLER "Built-in updater fetches installer (windows-only)" OFF)
 option(USE_DEVICE_TREZOR "Trezor support compilation" ON)
@@ -141,9 +142,21 @@ if(UNIX AND NOT APPLE)
 endif()
 
 include(GenerateDocs)
-include(TorQrcGenerator)
 
-# To build BestWallet with embedded (and static) Tor, pass CMake -DTOR_DIR=/path/to/tor/
+# Tor embedding.
+#
+# src/assets/tor holds an in-tree Tor binary and is what gets embedded when no
+# -DTOR_DIR is given, so that a plain `cmake -B build` yields a wallet able to
+# start its own Tor daemon instead of silently falling back to --use-local-tor.
+# -DTOR_DIR=/path/to/tor/ overrides it (those binaries are copied into
+# src/assets/tor first) and -DTOR_BUNDLED=Off opts out of embedding altogether,
+# for builds that ship Tor separately or deliberately without one.
+#
+# TOR_EMBED_DIR is the outcome the rest of the build reads: the directory whose
+# file names go into the Qt resource, or empty for a build with no Tor.
+set(TOR_ASSETS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/assets/tor")
+set(TOR_EMBED_DIR "")
+
 if(TOR_DIR)
     if (NOT TOR_VERSION)
         message(FATAL_ERROR "TOR_DIR is specified but TOR_VERSION is not set")
@@ -151,22 +164,72 @@ if(TOR_DIR)
 
     message(STATUS "Embedded Tor version: ${TOR_VERSION}")
 
-    # Always copy Tor when doing a reproducible build to prevent old versions from getting included
-    if (REPRODUCIBLE)
-        set(TOR_COPY_CMD "cp -a ${TOR_DIR}/* ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/tor")
-    else()
-        set(TOR_COPY_CMD "cp -au ${TOR_DIR}/* ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/tor")
+    # Pointing TOR_DIR at the in-tree directory asks cp to copy files onto
+    # themselves, which it reports as an error; there is nothing to copy anyway.
+    get_filename_component(TOR_DIR_REAL "${TOR_DIR}" REALPATH)
+    get_filename_component(TOR_ASSETS_DIR_REAL "${TOR_ASSETS_DIR}" REALPATH)
+
+    if(NOT TOR_DIR_REAL STREQUAL TOR_ASSETS_DIR_REAL)
+        # Always copy Tor when doing a reproducible build to prevent old versions from getting included
+        if (REPRODUCIBLE)
+            set(TOR_COPY_CMD "cp -a ${TOR_DIR}/* ${TOR_ASSETS_DIR}")
+        else()
+            set(TOR_COPY_CMD "cp -au ${TOR_DIR}/* ${TOR_ASSETS_DIR}")
+        endif()
+
+        execute_process(COMMAND bash -c "${TOR_COPY_CMD}" RESULT_VARIABLE ret)
+        if(ret EQUAL "1")
+            message(FATAL_ERROR "Tor copy failure: ${TOR_COPY_CMD}")
+        endif()
     endif()
 
-    execute_process(COMMAND bash -c "${TOR_COPY_CMD}" RESULT_VARIABLE ret)
-    if(ret EQUAL "1")
-        message(FATAL_ERROR "Tor copy failure: ${TOR_COPY_CMD}")
-    endif()
-
+    set(TOR_EMBED_DIR "${TOR_DIR}")
     message(STATUS "Embedding Tor binaries at ${TOR_DIR}")
+elseif(TOR_BUNDLED AND NOT TOR_INSTALLED)
+    set(TOR_ASSETS_BIN "${TOR_ASSETS_DIR}/tor")
+
+    if(NOT EXISTS "${TOR_ASSETS_BIN}")
+        message(STATUS "Skipping Tor inclusion: no Tor binary at ${TOR_ASSETS_BIN}")
+    # The in-tree binary is a static linux-x86_64 build. Embedding it in a build
+    # for anything else hands the wallet a daemon it cannot execute, so those
+    # targets need their own -DTOR_DIR.
+    elseif(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux" OR NOT CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+        message(STATUS "Skipping Tor inclusion: the in-tree Tor binary is linux-x86_64 only, target is ${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}. Pass -DTOR_DIR to embed one.")
+    else()
+        # TOR_VERSION drives the runtime unpack: TorManager::unpackBins() only
+        # writes the embedded binary out when it is newer than whatever is
+        # already in the config dir, and an unset version parses as 0.0.0.0,
+        # which never wins that comparison. Reading it off the binary keeps the
+        # two in step when the binary is replaced. Safe to execute: we only get
+        # here when it is built for the machine doing the configuring.
+        if(NOT TOR_VERSION)
+            execute_process(
+                COMMAND "${TOR_ASSETS_BIN}" --version
+                OUTPUT_VARIABLE TOR_VERSION_OUTPUT
+                RESULT_VARIABLE TOR_VERSION_RET
+                ERROR_QUIET
+            )
+
+            if(TOR_VERSION_RET EQUAL 0 AND TOR_VERSION_OUTPUT MATCHES "Tor version ([0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?)")
+                set(TOR_VERSION "${CMAKE_MATCH_1}")
+            endif()
+        endif()
+
+        if(NOT TOR_VERSION)
+            message(WARNING "Skipping Tor inclusion: could not read a version from ${TOR_ASSETS_BIN}. Pass -DTOR_VERSION to embed it anyway.")
+        else()
+            set(TOR_EMBED_DIR "${TOR_ASSETS_DIR}")
+            message(STATUS "Embedded Tor version: ${TOR_VERSION} (in-tree)")
+            message(STATUS "Embedding Tor binaries at ${TOR_ASSETS_DIR}")
+        endif()
+    endif()
+elseif(TOR_INSTALLED)
+    message(STATUS "Skipping Tor inclusion because Tor is installed alongside the application")
 else()
-    message(STATUS "Skipping Tor inclusion because -DTOR_DIR=Off")
+    message(STATUS "Skipping Tor inclusion because -DTOR_BUNDLED=Off")
 endif()
+
+include(TorQrcGenerator)
 
 message(STATUS "Using Boost include dir at ${Boost_INCLUDE_DIRS}")
 message(STATUS "Using Boost libraries at ${Boost_LIBRARIES}")

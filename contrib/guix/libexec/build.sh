@@ -311,7 +311,9 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
             CMAKEVARS+=" -DSTACK_TRACE=ON"
             case "$OPTIONS" in
                 no-tor-bundle)
-                    CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off"
+                    # TOR_BUNDLED=Off is what keeps the in-tree binary out; with
+                    # TOR_DIR alone the build would fall back to embedding it.
+                    CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off -DTOR_BUNDLED=Off"
                     ANONDIST+="-a"
                     ;;
                 pack)

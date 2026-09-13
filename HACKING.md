@@ -66,7 +66,7 @@ brew install qt libsodium libzip qrencode unbound cmake boost hidapi openssl exp
 
 ## Tor
 
-Reaching `.onion` nodes and the data service requires a Tor daemon. Development builds do not embed one — pass `-DTOR_DIR=/path/to/tor` if you want it bundled.
+Reaching `.onion` nodes and the data service requires a Tor daemon. Every build embeds the in-tree binary at `src/assets/tor` by default, which the wallet unpacks into its config directory and runs on `127.0.0.1:19450`. That binary is a static linux-x86_64 build; other targets need `-DTOR_DIR=/path/to/tor` (with `-DTOR_VERSION`) to bundle one, and `-DTOR_BUNDLED=Off` builds without Tor at all.
 
 Running Tor as a system service is the better option day to day: the wallet then attaches to the existing daemon instead of spawning and managing a child process on every launch.
 
@@ -137,7 +137,8 @@ CMake fails at configure time if a scoped enum makes it into a `.ui` file.
 |--------|---------|--------|
 | `-DSTATIC=ON` | OFF | Link statically. Requires a static Qt. |
 | `-DSELF_CONTAINED=OFF` | OFF | Turn off when building for distribution packages |
-| `-DTOR_DIR=/path/to/tor/` | OFF | Embed Tor binaries from the given directory. `TOR_VERSION` must be set alongside it. |
+| `-DTOR_DIR=/path/to/tor/` | OFF | Embed Tor binaries from the given directory instead of the in-tree one. `TOR_VERSION` must be set alongside it. |
+| `-DTOR_BUNDLED=OFF` | ON | Do not embed any Tor binary. The wallet then expects a system Tor on `socks5Host:socks5Port`. |
 | `-DCHECK_UPDATES=ON` | OFF | Build the update checker. Standalone binaries only. |
 | `-DPLATFORM_INSTALLER=ON` | OFF | Updater fetches an installer rather than an archive (Windows only) |
 | `-DUSE_DEVICE_TREZOR=OFF` | ON | Drop Trezor hardware wallet support |

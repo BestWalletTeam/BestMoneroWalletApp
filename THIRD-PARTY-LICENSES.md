@@ -98,8 +98,9 @@ Electrum's UI code and carry this attribution alongside the Monero Project's.
 
 Copyright (c) The Tor Project, Inc.
 
-Optionally embedded in release builds via the `TOR_DIR` CMake option. When
-bundled, Tor's own licence and notices ship with the distributed binary.
+A static Tor binary is kept in-tree at `src/assets/tor` and embedded in builds
+by default; `TOR_DIR` substitutes a different one and `TOR_BUNDLED=Off` omits it.
+When bundled, Tor's own licence and notices ship with the distributed binary.
 
 ---
 

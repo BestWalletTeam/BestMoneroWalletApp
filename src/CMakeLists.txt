@@ -231,7 +231,9 @@ if (CHECK_UPDATES)
     target_compile_definitions(BestWallet PRIVATE CHECK_UPDATES=1)
 endif()
 
-if(TOR_DIR)
+# Set by the Tor embedding block in the top-level CMakeLists.txt; empty when
+# this build ships no Tor binary at all.
+if(TOR_EMBED_DIR)
     target_compile_definitions(BestWallet PRIVATE HAS_TOR_BIN=1)
 endif()
 

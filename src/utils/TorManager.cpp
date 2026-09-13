@@ -245,7 +245,22 @@ bool TorManager::unpackBins() {
             QFileInfo assetFileInfo = QFileInfo(assetFile);
             QFile f(assetFile);
             QString filePath = QDir(this->torDir).filePath(assetFileInfo.fileName());
-            f.copy(filePath);
+
+            // QFile::copy() refuses to overwrite, and we write the binary out
+            // read-only, so anything already there has to go first. Without
+            // this a binary that exists but won't report a version (truncated
+            // write, half-finished unpack) is never replaced: it fails the
+            // isValid() check above, so it is not removed, and then every copy
+            // silently fails against it.
+            if (QFile::exists(filePath)) {
+                QFile::setPermissions(filePath, QFile::ReadOwner | QFile::WriteOwner);
+                QFile::remove(filePath);
+            }
+
+            if (!f.copy(filePath)) {
+                qWarning() << "Unable to write" << filePath << ":" << f.errorString();
+                return false;
+            }
             f.close();
         }
         qInfo() << "Wrote Tor binaries to: " << this->torDir;
@@ -340,7 +355,7 @@ bool TorManager::shouldStartTorDaemon() {
 SemanticVersion TorManager::getVersion(const QString &fileName) {
     QProcess process;
     process.setProcessChannelMode(QProcess::MergedChannels);
-    process.start(this->torPath, QStringList() << "--version");
+    process.start(fileName, QStringList() << "--version");
     process.waitForFinished(-1);
     QString output = process.readAllStandardOutput();
 
