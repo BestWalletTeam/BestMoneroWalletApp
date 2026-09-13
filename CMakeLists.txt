@@ -170,12 +170,12 @@ if(TOR_DIR)
     get_filename_component(TOR_ASSETS_DIR_REAL "${TOR_ASSETS_DIR}" REALPATH)
 
     if(NOT TOR_DIR_REAL STREQUAL TOR_ASSETS_DIR_REAL)
-        # Always copy Tor when doing a reproducible build to prevent old versions from getting included
-        if (REPRODUCIBLE)
-            set(TOR_COPY_CMD "cp -a ${TOR_DIR}/* ${TOR_ASSETS_DIR}")
-        else()
-            set(TOR_COPY_CMD "cp -au ${TOR_DIR}/* ${TOR_ASSETS_DIR}")
-        endif()
+        # Unconditional copy, never `cp -u`. src/assets/tor ships a Tor binary of
+        # its own now, so an mtime-conditional copy can decide the tracked file is
+        # current and leave it in place -- which would quietly embed the in-tree
+        # binary instead of the one TOR_DIR points at. For the guix builds that
+        # means shipping a Tor other than the one the release built from source.
+        set(TOR_COPY_CMD "cp -a ${TOR_DIR}/* ${TOR_ASSETS_DIR}")
 
         execute_process(COMMAND bash -c "${TOR_COPY_CMD}" RESULT_VARIABLE ret)
         if(ret EQUAL "1")
