@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 project(BestWallet
-  VERSION "2.9.1"
+  VERSION "3.0.0"
   DESCRIPTION "A free Monero desktop wallet"
   LANGUAGES CXX C ASM
 )
