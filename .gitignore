@@ -14,7 +14,6 @@ BestWallet.cbp
 src/assets_tor.qrc
 src/assets_docs.qrc
 BestWallet.AppDir/*
-src/assets/tor/*
 src/assets/docs/*
 !src/assets/tor/.gitkeep
 !src/assets/docs/.gitkeep
