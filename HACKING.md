@@ -9,8 +9,8 @@ The minimum supported Qt version is **6.4**.
 ## Getting the source
 
 ```bash
-git clone https://github.com/BestWalletTeam/BestWalletApp.git
-cd BestWallet
+git clone https://github.com/BestWalletTeam/BestMoneroWalletApp.git
+cd BestMoneroWalletApp
 git submodule update --init --recursive
 ```
 
@@ -109,8 +109,8 @@ CLion handles the CMake integration and ships a usable debugger, which makes it 
 
 Two things worth setting on that run configuration:
 
-- `MONERO_LOG_LEVEL=1` in the environment, for verbose logging
-- `--stagenet` in the program arguments, to work against stagenet instead of mainnet
+* `MONERO_LOG_LEVEL=1` in the environment, for verbose logging
+* `--stagenet` in the program arguments, to work against stagenet instead of mainnet
 
 Then `Run → Run 'BestWallet'`, or Shift + F10.
 
@@ -133,18 +133,18 @@ CMake fails at configure time if a scoped enum makes it into a `.ui` file.
 
 ## CMake options
 
-| Option | Default | Effect |
-|--------|---------|--------|
-| `-DSTATIC=ON` | OFF | Link statically. Requires a static Qt. |
-| `-DSELF_CONTAINED=OFF` | OFF | Turn off when building for distribution packages |
-| `-DTOR_DIR=/path/to/tor/` | OFF | Embed Tor binaries from the given directory instead of the in-tree one. `TOR_VERSION` must be set alongside it. |
-| `-DTOR_BUNDLED=OFF` | ON | Do not embed any Tor binary. The wallet then expects a system Tor on `socks5Host:socks5Port`. |
-| `-DCHECK_UPDATES=ON` | OFF | Build the update checker. Standalone binaries only. |
-| `-DPLATFORM_INSTALLER=ON` | OFF | Updater fetches an installer rather than an archive (Windows only) |
-| `-DUSE_DEVICE_TREZOR=OFF` | ON | Drop Trezor hardware wallet support |
-| `-DWITH_SCANNER=OFF` | ON | Drop the webcam QR code scanner |
-| `-DSTACK_TRACE=ON` | OFF | Dump a stack trace on crash (Linux only) |
-| `-DWITH_PLUGIN_<NAME>=OFF` | ON | Exclude a plugin: `HOME`, `TICKERS`, `CROWDFUNDING`, `REVUO`, `CALC` |
+| Option                     | Default | Effect                                                                                                          |
+| -------------------------- | ------- | --------------------------------------------------------------------------------------------------------------- |
+| `-DSTATIC=ON`              | OFF     | Link statically. Requires a static Qt.                                                                          |
+| `-DSELF_CONTAINED=OFF`     | OFF     | Turn off when building for distribution packages                                                                |
+| `-DTOR_DIR=/path/to/tor/`  | OFF     | Embed Tor binaries from the given directory instead of the in-tree one. `TOR_VERSION` must be set alongside it. |
+| `-DTOR_BUNDLED=OFF`        | ON      | Do not embed any Tor binary. The wallet then expects a system Tor on `socks5Host:socks5Port`.                   |
+| `-DCHECK_UPDATES=ON`       | OFF     | Build the update checker. Standalone binaries only.                                                             |
+| `-DPLATFORM_INSTALLER=ON`  | OFF     | Updater fetches an installer rather than an archive (Windows only)                                              |
+| `-DUSE_DEVICE_TREZOR=OFF`  | ON      | Drop Trezor hardware wallet support                                                                             |
+| `-DWITH_SCANNER=OFF`       | ON      | Drop the webcam QR code scanner                                                                                 |
+| `-DSTACK_TRACE=ON`         | OFF     | Dump a stack trace on crash (Linux only)                                                                        |
+| `-DWITH_PLUGIN_<NAME>=OFF` | ON      | Exclude a plugin: `HOME`, `TICKERS`, `CROWDFUNDING`, `REVUO`, `CALC`                                            |
 
 ## Documentation
 
