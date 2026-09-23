@@ -2,25 +2,25 @@
 
 A free and open-source Monero desktop wallet, written in C++ and Qt6. It runs on Windows, macOS, and Linux.
 
-- **Small and quick.** Comfortable on ordinary hardware, including virtual machines and live systems.
-- **Approachable, without holding you back.** Sensible for a first Monero wallet, while offering the feature set an experienced user would otherwise go to the CLI for.
-- **Sane out of the box, configurable when you need it.** Defaults suit most people; the settings are there for higher or more unusual threat models.
-- **Somewhere to try things.** Experimental features can be exercised here before they are ready for the reference wallets.
+* **Small and quick.** Comfortable on ordinary hardware, including virtual machines and live systems.
+* **Approachable, without holding you back.** Sensible for a first Monero wallet, while offering the feature set an experienced user would otherwise go to the CLI for.
+* **Sane out of the box, configurable when you need it.** Defaults suit most people; the settings are there for higher or more unusual threat models.
+* **Somewhere to try things.** Experimental features can be exercised here before they are ready for the reference wallets.
 
 The in-app help browser (**Help → Documentation**) covers everything from creating a wallet to airgapped signing. Its source lives in [`docs/guides`](docs/guides).
 
 ## Building
 
-There are no binary releases yet — build from source.
+Pre-built releases are available on the [GitHub Releases page](https://github.com/BestWalletTeam/BestMoneroWalletApp/releases). You can also build BestWallet from source.
 
-- **Development builds:** [HACKING.md](HACKING.md) covers dependencies, CMake options and IDE setup.
-- **Release builds:** [contrib/guix/README.md](contrib/guix/README.md) covers the reproducible, bootstrappable Guix build used for releases.
+* **Development builds:** [HACKING.md](HACKING.md) covers dependencies, CMake options and IDE setup.
+* **Release builds:** [contrib/guix/README.md](contrib/guix/README.md) covers the reproducible, bootstrappable Guix build used for releases.
 
 In short:
 
 ```bash
-git clone https://github.com/BestWalletTeam/BestWalletApp.git
-cd BestWallet
+git clone https://github.com/BestWalletTeam/BestMoneroWalletApp.git
+cd BestMoneroWalletApp
 git submodule update --init --recursive
 mkdir build && cd build
 cmake .. && cmake --build . -j $(nproc)
@@ -32,14 +32,16 @@ Release builds target x86_64 and aarch64 Linux and x86_64 Windows.
 
 Release builds are reproducible and bootstrappable: the toolchain itself can be built from source rather than trusted as a binary download, and independent builders can confirm that a published artifact matches the tagged source. If you did not build it yourself, verify it against the published hashes before running it.
 
+See the [latest release](https://github.com/BestWalletTeam/BestMoneroWalletApp/releases/latest) for the available artifacts, hashes, and release information.
+
 ## Contributing
 
-Issues and pull requests are welcome at [github.com/BestWalletTeam/BestWalletApp](https://github.com/BestWalletTeam/BestWalletApp).
+Issues and pull requests are welcome at [github.com/BestWalletTeam/BestMoneroWalletApp](https://github.com/BestWalletTeam/BestMoneroWalletApp).
 
-- [HACKING.md](HACKING.md) — setting up a development environment
-- [MAINTENANCE.md](MAINTENANCE.md) — what the project prioritises, and why
-- [RELEASE.md](RELEASE.md) — how a release is cut
-- [SECURITY.md](SECURITY.md) — reporting a vulnerability. **Do not open a public issue for a security problem.**
+* [HACKING.md](HACKING.md) — setting up a development environment
+* [MAINTENANCE.md](MAINTENANCE.md) — what the project prioritises, and why
+* [RELEASE.md](RELEASE.md) — how a release is cut
+* [SECURITY.md](SECURITY.md) — reporting a vulnerability. **Do not open a public issue for a security problem.**
 
 ## Credits
 
