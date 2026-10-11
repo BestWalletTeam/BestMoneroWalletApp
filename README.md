@@ -1,4 +1,4 @@
-# BestWallet
+# BestWallet - Monero2014.com & Bestmonerowallet.app
 
 <img width="1302" height="738" alt="BestWallet Monero desktop wallet" src="https://github.com/user-attachments/assets/6a93f48b-9572-49ac-81cb-1192bc6bd9da" />
 
